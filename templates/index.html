@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CGPA Calculator</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <style>
+    :root {
+      --bg-light: linear-gradient(135deg, #6e8efb, #a777e3);
+      --bg-dark: #121212;
+      --text-dark: #fff;
+      --text-light: #000;
+      --card-bg-light: #fff;
+      --card-bg-dark: #1e1e1e;
+    }
+
+    body {
+      background: var(--bg-light);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      flex-direction: column;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .card {
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+      padding: 30px;
+      background-color: var(--card-bg-light);
+      width: 100%;
+      max-width: 1000px;
+      color: var(--text-light);
+      transition: all 0.3s ease-in-out;
+      position: relative;
+    }
+
+    .btn-primary {
+      background: linear-gradient(90deg, #4e54c8, #8f94fb);
+      border: none;
+    }
+
+    .btn-danger {
+      background: linear-gradient(90deg, #ff416c, #ff4b2b);
+      border: none;
+    }
+
+    .form-label {
+      font-weight: 600;
+    }
+
+    h2 {
+      background: linear-gradient(90deg, #4e54c8, #8f94fb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 800;
+    }
+
+    footer {
+      margin-top: 20px;
+      font-size: 0.9rem;
+      color: white;
+      text-align: center;
+    }
+
+    .dark-mode {
+      background: var(--bg-dark) !important;
+      color: var(--text-dark) !important;
+    }
+
+    .dark-mode .card {
+      background-color: var(--card-bg-dark) !important;
+      color: var(--text-dark) !important;
+    }
+
+    .toggle-switch {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+
+    footer a {
+      color: white;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    .table td, .table th {
+      vertical-align: middle;
+    }
+
+    .message-button {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 999;
+      padding: 10px 16px;
+      font-weight: bold;
+      border-radius: 50px;
+      background-color: #0dcaf0;
+      color: white;
+      border: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      transition: background 0.3s;
+    }
+
+    .message-button:hover {
+      background-color: #0bb1d6;
+    }
+  </style>
+</head>
+<body>
+  <!-- Dark Mode Toggle + Admin Login -->
+  <div class="toggle-switch d-flex gap-2">
+    <button class="btn btn-sm btn-outline-light" onclick="toggleDarkMode()">
+      🌙 Toggle Dark Mode
+    </button>
+    <a href="{{ url_for('admin_login') }}" class="btn btn-sm btn-outline-warning">
+      🔐 Admin Login
+    </a>
+  </div>
+
+  <div class="card">
+    <h2 class="text-center mb-4">🎓 NIT Nagaland SGPA Calculator</h2>
+
+    <div class="row">
+      <!-- CGPA Form -->
+      <div class="col-md-7">
+        <form method="POST" action="/calculate">
+          <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input type="text" class="form-control" name="name" value="{{ name or '' }}" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Registration Number</label>
+            <input type="text" class="form-control" name="regno" value="{{ regno or '' }}" required>
+          </div>
+
+          <div id="input-container">
+            <div class="row g-2 mb-3 align-items-end">
+              <div class="col">
+                <label class="form-label">Grade</label>
+                <input type="text" name="grade" class="form-control" required>
+              </div>
+              <div class="col">
+                <label class="form-label">Credit</label>
+                <input type="number" step="0.5" name="credit" class="form-control" required>
+              </div>
+              <div class="col-auto">
+                <label class="form-label d-block">&nbsp;</label>
+                <button type="button" class="btn btn-danger" onclick="deleteRow(this)">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-outline-secondary mb-3 w-100" onclick="addRow()">+ Add More Subjects</button>
+          <button type="submit" class="btn btn-primary w-100">Calculate CGPA</button>
+        </form>
+      </div>
+
+      <!-- Grade Weightage Table -->
+      <div class="col-md-5">
+        <h5 class="text-primary mt-3">📊 Grade to Weightage</h5>
+        <table class="table table-bordered text-center mt-2">
+          <thead class="table-light">
+            <tr>
+              <th>Grade</th>
+              <th>Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>S</td><td>10</td></tr>
+            <tr><td>A</td><td>9</td></tr>
+            <tr><td>B</td><td>8</td></tr>
+            <tr><td>C</td><td>7</td></tr>
+            <tr><td>D</td><td>6</td></tr>
+            <tr><td>E</td><td>5</td></tr>
+            <tr><td>U</td><td>0</td></tr>
+            <tr><td>AB</td><td>0</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    {% if cgpa %}
+      <hr class="my-4">
+      <h5 class="text-success">Hey {{ name }}, You have scored {{ cgpa }} SGPA in this Semester!</h5>
+      <h6>Registration No: {{ regno }}</h6>
+
+      {% if detailed_data %}
+      <hr class="my-4">
+      <h5 class="text-primary">Detailed Calculation</h5>
+      <table class="table table-bordered table-striped mt-3">
+          <thead class="table-light">
+              <tr>
+                  <th>Grade</th>
+                  <th>Credit</th>
+                  <th>Weight</th>
+                  <th>Grade × Credit</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for grade, credit, weight in detailed_data %}
+              <tr>
+                  <td>{{ grade }}</td>
+                  <td>{{ credit }}</td>
+                  <td>{{ weight }}</td>
+                  <td>{{ weight * credit }}</td>
+              </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+      {% endif %}
+
+      <hr class="my-4">
+      <div class="alert alert-warning mt-3">
+        <strong><i class="bi bi-lightbulb-fill"></i> Improvement Areas:</strong>
+        <ul class="mb-0">
+          {% if suggestions %}
+            {% for suggestion in suggestions %}
+              <li><i class="bi bi-arrow-right-circle-fill text-danger"></i> {{ suggestion }}</li>
+            {% endfor %}
+          {% else %}
+              <li><i class="bi bi-check-circle-fill text-success"></i> You're doing great! Keep it up!</li>
+          {% endif %}
+        </ul>
+      </div>
+
+      <form method="POST" action="/export" class="mt-3">
+        {% for g, c in data %}
+          <input type="hidden" name="grade" value="{{ g }}">
+          <input type="hidden" name="credit" value="{{ c }}">
+        {% endfor %}
+        <input type="hidden" name="regno" value="{{ regno }}">
+        <input type="hidden" name="name" value="{{ name }}">
+        <button type="submit" class="btn btn-danger w-100">📄 Export to PDF</button>
+      </form>
+    {% endif %}
+  </div>
+
+<a href="{{ url_for('messages') }}" class="btn btn-info message-button">
+  💬 Message
+</a>
+
+
+  <!-- Footer -->
+  <footer>
+    Programmed with ❤️ by <strong>QuarkX</strong><br>
+    <a href="https://www.github.com/hrishabhxcode" target="_blank" class="d-block">
+      <i class="bi bi-github"></i> github.com/hrishabhxcode
+    </a>
+    <a href="https://linkedin.com/hrishabhxcode" target="_blank" class="d-block">
+      <i class="bi bi-linkedin"></i> linkedin.com/hrishabhxcode
+    </a>
+  </footer>
+
+  <!-- Scripts -->
+  <script>
+    function addRow() {
+      const container = document.getElementById('input-container');
+      const row = document.createElement('div');
+      row.className = 'row g-2 mb-3 align-items-end';
+      row.innerHTML = `
+        <div class="col">
+          <input type="text" name="grade" class="form-control" placeholder="Grade" required>
+        </div>
+        <div class="col">
+          <input type="number" step="0.5" name="credit" class="form-control" placeholder="Credit" required>
+        </div>
+        <div class="col-auto">
+          <button type="button" class="btn btn-danger" onclick="deleteRow(this)">
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>`;
+      container.appendChild(row);
+    }
+
+    function deleteRow(button) {
+      button.closest('.row').remove();
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark-mode");
+      document.querySelector(".card").classList.toggle("dark-mode");
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Public Messages</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --primary: #4e54c8;
+      --secondary: #8f94fb;
+      --bg-light: #f5f7fa;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(120deg, var(--primary), var(--secondary));
+      min-height: 100vh;
+      padding: 50px 15px;
+      color: #333;
+      position: relative;
+    }
+
+    .container {
+      max-width: 750px;
+      margin: auto;
+    }
+
+    .header {
+      color: white;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .message-form {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(12px);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      margin-bottom: 40px;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .message-card {
+      background: rgba(255, 255, 255, 0.8);
+      border: none;
+      border-radius: 18px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+      margin-bottom: 25px;
+      backdrop-filter: blur(6px);
+      animation: fadeInUp 0.6s ease;
+    }
+
+    .form-control, .btn {
+      border-radius: 12px;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background-color: #3c41aa;
+    }
+
+    .text-muted {
+      color: #fff !important;
+      opacity: 0.8;
+    }
+
+    .text-primary {
+      color: #ffffff !important;
+    }
+
+    .btn-outline-secondary {
+      color: white;
+      border-color: white;
+    }
+
+    .btn-outline-secondary:hover {
+      background-color: white;
+      color: #4e54c8;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .footer-text {
+      position: fixed;
+      bottom: 10px;
+      width: 100%;
+      text-align: center;
+      font-size: 0.95rem;
+      color: white;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    }
+
+    @media (max-width: 576px) {
+      .message-form, .message-card {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="text-center fw-bold mb-5 header">💬 Panchayat</h1>
+
+    <form method="POST" class="message-form">
+      <div class="mb-3">
+        <input type="text" name="alias" class="form-control" placeholder="Enter your alias (e.g. QuarkX)" required>
+      </div>
+      <div class="mb-3">
+        <textarea name="message" rows="3" class="form-control" placeholder="Type your message here (max 200 words)" required></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary w-100">🚀 Post Message</button>
+    </form>
+
+    {% if messages %}
+      {% for msg in messages %}
+        <div class="card message-card">
+          <div class="card-body">
+            <p class="mb-2">{{ msg.content|safe }}</p>
+            <small>— <strong>{{ msg.alias }}</strong> • {{ msg.timestamp.strftime('%Y-%m-%d %H:%M:%S') }} UTC</small>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="text-center text-muted">No messages yet. Be the first to post! 💬</p>
+    {% endif %}
+
+    <div class="text-center mt-5">
+      <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">← Back to CGPA Calculator</a>
+    </div>
+  </div>
+
+  <div class="footer-text">
+    ❤️ Made with Love by Hrishabh
+  </div>
+</body>
+</html>
