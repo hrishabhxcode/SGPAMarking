@@ -1,7 +1,5 @@
 from flask import Flask, render_template, request, send_file
-import pdfkit
-import tempfile
-import os
+
 
 app = Flask(__name__)
 
